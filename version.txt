@@ -1,14 +1,15 @@
-PureMVC AS3 Utility|Demo - ???
-By ??? <???@puremvc.org>
-Copyright(c) 2007 ???, Some rights reserved.
+PureMVC AS2 FlashLite Demo - Balloonatroid
+Copyright (c) 2007, 2008 Some rights reserved. 
+By Cliff Hall <clifford.hall@puremvc.org> and 
+Chandima Cumaranatunge <chandima.cumaranatunge@puremvc.org>
 --------------------------------------------------------------------------
-Release Date: ??/??/??
-    Platform: ActionScript 3  
-     Version: 1 
-    Revision: 0
-      Author: Dragos Dascalita <dragos.dascalita@puremvc.org>
+Release Date: 01/01/08
+    Platform: ActionScript 2  
+     Version:0. 
+    Revision: 4
+     Authors: Cliff Hall <clifford.hall@puremvc.org> and 
+              Chandima Cumaranatunge <chandima.cumaranatunge@puremvc.org>
      License: Creative Commons Attribution 3.0 United States License
 --------------------------------------------------------------------------
-0.9 - Checked in initial folder structure and license - CLH
+0.4 - Checked in initial working model for handoff to Chandima - CLH
 
-1.0 - 

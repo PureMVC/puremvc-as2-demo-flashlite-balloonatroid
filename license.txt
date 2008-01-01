@@ -1,6 +1,7 @@
-PureMVC AS3 Utility - Undo
-By ???? ??? <???.???@puremvc.org>
-Copyright(c) 2007 ??? ???, Some rights reserved.
+PureMVC AS2 FlashLite Demo - Balloonatroid
+Copyright (c) 2007, 2008 Some rights reserved. 
+By Cliff Hall <clifford.hall@puremvc.org> and 
+Chandima Cumaranatunge <chandima.cumaranatunge@puremvc.org>
 --------------------------------------------------------------------------
  Reuse governed by Creative Commons Attribution 3.0 United States License
    View this license and the associated Creative Commons deed online at: 
