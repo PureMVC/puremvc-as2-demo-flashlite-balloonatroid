@@ -54,3 +54,15 @@ getting a lot of good experience, but I don't know if it extends to this
 problem with FlashLite 2.0.
 
 -=Cliff>
+
+----------------------------------------------------------------------------
+AS2 Classpath in Flash CS3
+----------------------------------------------------------------------------
+The PureMVC AS2 classes can be downloaded from from the SVN Repository: 
+
+http://svn.puremvc.org/PureMVC_AS2
+
+The AS2 classpath in Flash needs to include the PureMVC AS2 classes.
+Set the AS2 classpath as documented in livedocs:
+
+http://livedocs.adobe.com/flash/9.0/UsingFlash/WS3e7c64e37a1d85e1e229110db38dec34-7fa2.html
