@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------
-Package Space
+Package Space 
 ----------------------------------------------------------------------------
 Note that the ordinary package scheme that should be applied to this demo is 
 org.puremvc.as2.demos.flashlite.balloonatroid.*
