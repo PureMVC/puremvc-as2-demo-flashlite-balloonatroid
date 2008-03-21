@@ -1,111 +1,1 @@
-﻿/*
- PureMVC AS2 FlashLite Demo - Balloonatroid
- Copyright (c) 2007, 2008 by
- Cliff Hall <clifford.hall@puremvc.org> and 
- Chandima Cumaranatunge <chandima.cumaranatunge@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
-import org.puremvc.as2.interfaces.*;
-import org.puremvc.as2.patterns.mediator.*;
-import org.puremvc.as2.patterns.observer.*;
-
-import balloonatroid.*;
-import balloonatroid.view.*;
-import balloonatroid.model.*;
-
-/**
- * Mediator for the Boss Sprite 
- */
-class balloonatroid.view.BossSpriteMediator 
-extends AbstractSpriteMediator implements IMediator
-{
-	
-	/**
-	 * Constructor. 
-	 */
-	public function BossSpriteMediator( viewComponent:Object ) 
-	{
-		// pass the MovieClip and the Sprite type
-		super( viewComponent, GameSprite.BOSS );
-
-		// initialize sprite state
-		boss.inertia = GameSprite.EASE_IN;
-		boss.active = false;
-		
-	}
-
-	/**
-	 * List all notifications this Mediator is interested in.
-	 * <P>
-	 * Automatically called by the framework when the mediator
-	 * is registered with the view.</P>
-	 * 
-	 * @return Array the list of Nofitication names
-	 */
-	public function listNotificationInterests():Array 
-	{
-		return [ 
-					GameFacade.SHOW_BOSS,
-					GameSprite.DETECT_COLLISION					
-			   ];
-	}
-
-	/**
-	 * Handle all notifications this Mediator is interested in.
-	 * <P>
-	 * Called by the framework when a notification is sent that
-	 * this mediator expressed an interest in when registered
-	 * (see <code>listNotificationInterests</code>.</P>
-	 * 
-	 * @param INotification a notification 
-	 */
-	public function handleNotification( note:INotification ):Void 
-	{
-		switch ( note.getName() ) 
-		{
-			// bring the boss onto the playfield
-			case GameFacade.SHOW_BOSS:
-				boss.showSprite();
-				boss.adjustDrift( 0, .5 );
-				boss.active = true;
-				break;					
-
-			// handle collision detect messages
-			case GameSprite.DETECT_COLLISION:
-				if (!boss.active) break; // ignore message if sprite not active
-				var targetSprite:GameSprite = GameSprite( note.getBody() );
-				switch ( note.getType() ) 
-				{
-					// ignore boss and defenders
-					case GameSprite.BOSS:
-					case GameSprite.DEFENDER:
-						break;
-						
-					// handle shield collision detect
-					case GameSprite.SHIELD:
-						if ( targetSprite.hitDetect( boss )  ) 
-						{
-							trace('Boss crashes into shield and dies');
-							boss.active = false;
-							boss.hideSprite();
-						}
-						break;
-						
-					// handle volley collision detect
-					case GameSprite.VOLLEY:
-						if ( targetSprite.hitDetect( boss )   ) 
-						{
-							trace('Boss takes hit from volley!');
-							boss.active = false;
-							boss.hideSprite();
-						}
-						break;
-				}
-				break;					
-		}
-	}
-
-	function get boss():GameSprite{
-		return sprite;
-	}
-}
+﻿import org.puremvc.as2.interfaces.*;import org.puremvc.as2.patterns.mediator.*;import org.puremvc.as2.patterns.observer.*;import balloonatroid.*;import balloonatroid.view.*;import balloonatroid.model.*;import balloonatroid.model.game.*;import balloonatroid.model.boss.*;import balloonatroid.model.defender.*;import mx.utils.Delegate;/** * A Mediator for interacting with the Boss Sprite. * Adds itself to the {@link balloonatroid.model.SpriteEntitiesProxy sprite entities collection } on {@link #onRegister()}. * Registers <code>EnterFrame</code> {@link #enterFrameHandler() handler} and updates its current state. * Listens to {@link balloonatroid.GameFacade#BIRTH_DEFENDER BIRTH_DEFENDER} notifications and births Defender Balloons. */class BossSpriteMediator extends Mediator implements IMediator {		/** Cannonical name of the Mediator. */	public static var NAME:String = 'BossSpriteMediator';		/** Local reference to {@link balloonatroid.model.BossProxy}. */	private var bossProxy : BossProxy;		/** Local reference to {@link balloonatroid.model.GameProxy}. */	private var gameProxy : GameProxy;		/** Local reference to {@link balloonatroid.views.PlayScreenMediator parent mediator}. */	private var playScreenMediator : PlayScreenMediator;		/** 	 * Reference to the 'level_container_mc' instance in <code>Balloonatroid.fla</code>. 	 * Level Movie is loaded into this container <code>MovieClip</code> in <code>Balloonatroid.fla</code>.	 */	private var levelContainer_mc 			: MovieClip;		/** Reference to the 'defender_balloon_mc' instance in <code>LevelXX.fla</code> (level <code>MovieClip</code>). */	private var defenderBalloonMaster_mc 	: MovieClip;		/**	 * Constructor. 	 */ 	public function BossSpriteMediator( viewComponent : MovieClip ) 	{		// pass the viewComponent to the superclass		super( NAME, viewComponent );	}		/**	 * Called by the View when the Mediator is registered.	 * Registers {@link #enterFrameHandler()} method as an {@code EnterFrame} event handler to the sprite.	 * @use Expects <code>BossProxy</code> and <code>GameProxy</code> to be registered previously.	 */ 	public function onRegister( ) : Void 	{		// local references to proxies		bossProxy = BossProxy( facade.retrieveProxy( BossProxy.NAME ) );		gameProxy = GameProxy( facade.retrieveProxy( GameProxy.NAME ) );				// local references to mediators		playScreenMediator = PlayScreenMediator( facade.retrieveMediator( PlayScreenMediator.NAME ) );				// level container MovieClip		levelContainer_mc = playScreenMediator.levelContainer;				// reference to the defender balloon master instance.		defenderBalloonMaster_mc = playScreenMediator.defenderInstance;				// listen for enterframe events		sprite.onEnterFrame = Delegate.create( this, enterFrameHandler );	}		/**	 * List of all notifications this Mediator is interested in.	 * <P>	 * Automatically called by the framework when the mediator	 * is registered with the view.</P>	 * 	 * @return The list of Nofitication interests listed in.	 */	public function listNotificationInterests():Array 	{		return [ 					GameFacade.BIRTH_DEFENDER 			   ];	}		/**	 * Handle all notifications this Mediator is interested in.	 * <P>	 * Called by the framework when a notification is sent that this mediator expressed an interest in when registered.	 * Births Defender Balloon on receipt of {@link balloonatroid.GameFacade#BIRTH_DEFENDER BIRTH_DEFENDER} notification.	 * Defender is created by duplicating the master defender instance in <code>LevelXX.fla</code> (level <code>MovieClip</code>).	 * Initial position of defender is the registration point of the Boss.	 * {@link balloonatroid.view.DefenderSpriteMediator DefenderSpriteMediator} and {@link balloonatroid.model.DefenderProxy DefenderProxy}	 * names are set to instance name of the defender {@code MovieClip} instance.	 * Defender immediately goes into the {@link balloonatroid.model.defender.AttackState ATTACK} state.	 * @param INotification a notification 	 */	public function handleNotification( note : INotification ) : Void 	{		switch ( note.getName() ) 		{			// generated from Boss WANDER state			case GameFacade.BIRTH_DEFENDER: 							/**				 * Prepare a **DEFENDER** balloon				 */				var defender_mc:MovieClip;				  				// asign a defender instance name and decrement number of children in the boss data object				var defenderName = 'defender_' + bossProxy.remainingChildren-- + '_mc';								// duplicate defender instance to create new defenders 				// new defender is created in its parent (level container MovieClip)				defender_mc = defenderBalloonMaster_mc.duplicateMovieClip( defenderName, 														levelContainer_mc.getNextHighestDepth());								// set the initial location to the registtration point of the boss				defender_mc._x = bossProxy.sprite._x;				defender_mc._y = bossProxy.sprite._y;								facade.registerProxy( new DefenderProxy( defender_mc._name, AbstractDefenderDO(  defender_mc ) ) ); // model				// go to the defender ATTACK state -- pass instance name as the message payload				sendNotification( GameFacade.GO_DEFENDER_ATTACK, defender_mc._name ); 				facade.registerMediator( new DefenderSpriteMediator( defender_mc._name, defender_mc ) ); // view								//GameFacade.log.info('birthed defender ' + defender_mc);								break;		}	}		/**	 * {@code EnterFrame} handler updates the current boss balloon state.	 */	private function enterFrameHandler():Void 	{		bossProxy.update();	}		/**	 * Cast the viewComponent to its actual type.	 * 	 * @return stage the viewComponent cast to MovieClip	 */	public function get sprite():MovieClip{		return MovieClip(viewComponent);	}}

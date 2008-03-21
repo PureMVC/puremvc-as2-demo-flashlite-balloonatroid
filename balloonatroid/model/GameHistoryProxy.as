@@ -1,48 +1,1 @@
-﻿/*
- PureMVC AS2 FlashLite Demo - Balloonatroid
- Copyright (c) 2007, 2008 by
- Cliff Hall <clifford.hall@puremvc.org> and 
- Chandima Cumaranatunge <chandima.cumaranatunge@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
-import org.puremvc.as2.interfaces.IProxy;
-import org.puremvc.as2.patterns.proxy.Proxy;
-import balloonatroid.model.GameHistoryVO;
-
-class balloonatroid.model.GameHistoryProxy extends 
-	org.puremvc.as2.patterns.proxy.Proxy implements IProxy
-{
-	public static var NAME:String = 'GameHistoryProxy';
-
-	public function GameHistoryProxy( )
-	{
-		super( NAME );
-		
-		SharedObject.addListener( "History", loadCompleteHistory );
-		var History:SharedObject = SharedObject.getLocal("History");
-		
-	}
-	
-	/**
-	 * Called when the history SharedObject is loaded.
-	 */
-	public function loadCompleteHistory ( mySO:SharedObject ) {
-
-		if (0 == mySO.getSize() )
-		{ 
-			mySO.data.history = new GameHistoryVO();
-			data = mySO.data.history;
-		}
-		else
-		{ 
-			data = mySO.data.history;
-		}
-	}
-
-
-	public function get gameHistory():GameHistoryVO
-	{
-		return GameHistoryVO( data );
-	}
-	
-}
+﻿/* PureMVC AS2 FlashLite Demo - Balloonatroid Copyright (c) 2007, 2008 by Cliff Hall <clifford.hall@puremvc.org> and  Chandima Cumaranatunge <chandima.cumaranatunge@puremvc.org> Your reuse is governed by the Creative Commons Attribution 3.0 License */import org.puremvc.as2.interfaces.IProxy;import org.puremvc.as2.patterns.proxy.Proxy;import balloonatroid.*;import balloonatroid.model.game.GameHistoryVO;import mx.utils.Delegate;/** * Proxy for interacting with the {@link balloonatroid.model.game.GameHistoryVO Game History Value Object}. * The game history value object is saved on the phone as a Flash Lite shared object. * * @see <a href="http://livedocs.adobe.com/flashlite/2/main/00000749.html">Flash Lite version of the SharedObject class</a> */class balloonatroid.model.GameHistoryProxy extends 	org.puremvc.as2.patterns.proxy.Proxy implements IProxy{	/** Cannonical name of the Proxy. */	public static var NAME:String = 'GameHistoryProxy';	/**	 * Constructor.	 * Creates a new instance of {@link balloonatroid.model.game.GameHistoryVO}	 * and assigns it as the value object for the proxy.	 */	public function GameHistoryProxy( )	{		super( NAME, new GameHistoryVO() ); // for debugging only	}		/**	 * Initiates asynchronous loading of the game history shared object.	 * Registers {@link #historyLoaded()} as a listener.	 */	public function loadCompleteHistory() : Void	{		var History:SharedObject = SharedObject.getLocal("history");		SharedObject.addListener( "history", Delegate.create( this, historyLoaded ) );				/**		 * The HISTORYLOADED notification is sent here as shared objects doen't		 * work on Adbobe Device Central. This should be taken out.		 */		if ( GameFacade.debug ) sendNotification( GameFacade.HISTORYLOADED ); // for debugging only	}		/**	 * Called when the history SharedObject is loaded.	 * Sets the data object for the proxy to the loaded shared object	 * or creates a new {@link balloonatroid.model.game.GameHistoryVO GameHistoryVO} data object if empty.	 * Broadcasts a {@link balloonatroid.GameFacade#HISTORYLOADED} notification on success.	 */	public function historyLoaded ( mySO:SharedObject ) {		if (0 == mySO.getSize() )		{ 			mySO.data.history = new GameHistoryVO();			data = mySO.data.history;		}		else		{ 			data = mySO.data.history;		}		SharedObject.removeListener( "history" );		sendNotification( GameFacade.HISTORYLOADED );	}	/**	 * Cast the data object to its actual type.	 * 	 * @return The game history cast to {@link balloonatroid.model.game.GameHistoryVO GameHistoryVO}.	 */	public function get gameHistory():GameHistoryVO	{		return GameHistoryVO( data );	}	}

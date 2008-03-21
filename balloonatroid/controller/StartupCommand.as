@@ -1,35 +1,1 @@
-﻿/*
- PureMVC AS2 FlashLite Demo - Balloonatroid
- Copyright (c) 2007, 2008 by
- Cliff Hall <clifford.hall@puremvc.org> and 
- Chandima Cumaranatunge <chandima.cumaranatunge@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
-import org.puremvc.as2.interfaces.ICommand;
-import org.puremvc.as2.interfaces.INotification;
-import org.puremvc.as2.patterns.command.SimpleCommand;
-
-import balloonatroid.*;
-import balloonatroid.view.*;
-import balloonatroid.model.*;
-
-class balloonatroid.controller.StartupCommand 
-extends SimpleCommand implements ICommand
-{
-	/**
-	 * Prepare the Model and View at startup time
-	 */
-	public function execute( note:INotification ) : Void    
-	{
-		// Prepare the Model				
-		facade.registerProxy( new GameStateProxy( ) );
-		facade.registerProxy( new GameHistoryProxy( ) );
-		
-		// Prepare the View
-		var game:MovieClip = MovieClip( note.getBody() );
-		facade.registerMediator( new GameClipMediator( game ) );
-
-		// Send the SPLASH notification to show splash screen
-		sendNotification( GameFacade.GO_SPLASH );
-	}
-}
+﻿/* PureMVC AS2 FlashLite Demo - Balloonatroid Copyright (c) 2007, 2008 by Cliff Hall <clifford.hall@puremvc.org> and  Chandima Cumaranatunge <chandima.cumaranatunge@puremvc.org> Your reuse is governed by the Creative Commons Attribution 3.0 License */import org.puremvc.as2.interfaces.ICommand;import org.puremvc.as2.interfaces.INotification;import org.puremvc.as2.patterns.command.SimpleCommand;import balloonatroid.*;import balloonatroid.view.*;import balloonatroid.model.*;class balloonatroid.controller.StartupCommand extends SimpleCommand implements ICommand{	/**	 * Prepare the essential Models and Views and go to the game splash screen state.	 *	 * Invoked from the concrete facade. Registers 	 * {@code GameProxy GameHistoryProxy SpriteEntitiesProxy}	 * proxies and the {@code StageMediator} mediator.	 *	 * @param note Notification with the root MovieClip as body.	 * @see balloonatroid.GameFacade#startup()	 * @see balloonatroid.model.GameProxy	 * @see balloonatroid.model.GameHistoryProxy	 * @see balloonatroid.model.SpriteEntitiesProxy	 * @see balloonatroid.view.StageMediator	 */	public function execute( note:INotification ) : Void 	{		// Get the game context _root		var game:MovieClip = MovieClip( note.getBody() );				// Prepare the game Model			facade.registerProxy( new GameProxy( game ) ); 		// Game state		facade.registerProxy( new GameHistoryProxy() );		// Game history saved in shared object		facade.registerProxy( new SpriteEntitiesProxy() );	// Game sprite collection				// Prepare the root Game View		facade.registerMediator( new StageMediator( game ) );				// Send notification to go into the splash screen state		sendNotification( GameFacade.GO_SPLASH );	}}

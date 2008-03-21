@@ -1,100 +1,1 @@
-﻿/*
- PureMVC AS2 FlashLite Demo - Balloonatroid
- Copyright (c) 2007, 2008 by
- Cliff Hall <clifford.hall@puremvc.org> and 
- Chandima Cumaranatunge <chandima.cumaranatunge@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
-import org.puremvc.as2.interfaces.*;
-import org.puremvc.as2.patterns.mediator.*;
-import org.puremvc.as2.patterns.observer.*;
-
-import balloonatroid.*;
-import balloonatroid.view.*;
-import balloonatroid.model.*;
-
-/**
- * Mediator for the Defender Sprite 
- */
-class balloonatroid.view.DefenderSpriteMediator 
-extends AbstractSpriteMediator implements IMediator
-{
-	
-	/**
-	 * Constructor. 
-	 */
-	public function DefenderSpriteMediator( viewComponent:Object ) 
-	{
-		// pass the MovieClip and the Sprite type
-		super( viewComponent, GameSprite.DEFENDER );
-
-		// initialize sprite state
-		defender.inertia = GameSprite.EASE_IN;
-		defender.active = true;
-	
-	}
-
-	/**
-	 * List all notifications this Mediator is interested in.
-	 * <P>
-	 * Automatically called by the framework when the mediator
-	 * is registered with the view.</P>
-	 * 
-	 * @return Array the list of Nofitication names
-	 */
-	public function listNotificationInterests():Array 
-	{
-		return [ 
-					GameSprite.DETECT_COLLISION;
-			   ];
-	}
-
-	/**
-	 * Handle all notifications this Mediator is interested in.
-	 * <P>
-	 * Called by the framework when a notification is sent that
-	 * this mediator expressed an interest in when registered
-	 * (see <code>listNotificationInterests</code>.</P>
-	 * 
-	 * @param INotification a notification 
-	 */
-	public function handleNotification( note:INotification ):Void 
-	{
-		switch ( note.getName() ) 
-		{
-			// handle collision detect messages
-			case GameSprite.DETECT_COLLISION:
-				if (!defender.active) break; // ignore message if sprite not active
-				var targetSprite:GameSprite = GameSprite( note.getBody() );
-				switch ( note.getType() ) 
-				{
-					// ignore boss and defenders
-					case GameSprite.BOSS:
-					case GameSprite.DEFENDER:
-						break;
-						
-					// handle shield collision detect
-					case GameSprite.SHIELD:
-						if ( targetSprite.hitDetect( defender ) ) 
-						{
-							trace('Defender crashes into shield and dies');
-						}
-						break;
-						
-					// handle volley collision detect
-					case GameSprite.VOLLEY:
-						if ( targetSprite.hitDetect( defender ) ) 
-						{
-							trace('Defender crashes into volley and dies');
-						}
-						break;
-				}
-				break;					
-
-		}
-	}
-
-	function get defender():GameSprite{
-		return sprite;
-	}
-}
+﻿import org.puremvc.as2.interfaces.*;import org.puremvc.as2.patterns.mediator.*;import org.puremvc.as2.patterns.observer.*;import balloonatroid.*;import balloonatroid.view.*;import balloonatroid.model.*;import balloonatroid.model.game.*;import mx.utils.Delegate;/** * A Mediator for interacting with the Defender Sprite. * Adds and removes itself from the {@link balloonatroid.model.SpriteEntitiesProxy sprite entities collection }  * on {@link #onRegister()} and {@link #onRemove()}. * Registers <code>EnterFrame</code> {@link #enterFrameHandler() handler} and updates its current state. */class DefenderSpriteMediator extends Mediator implements IMediator {		/** Local reference to {@link balloonatroid.model.DefenderProxy}. */	private var defenderProxy : DefenderProxy;		/**	 * Constructor. 	 * @param mediatorName The instance name of the defender <code>MovieClip</code>.	 * @param viewComponent The <code>MovieClip</code> instance of the defender.	 */ 	public function DefenderSpriteMediator( mediatorName:String, viewComponent:MovieClip ) 	{		super( mediatorName, viewComponent );	}		/**	 * Called by the View when the Mediator is registered.	 * Registers <code>EnterFrame</code> handler.	 * Adds defender balloon to sprite entities collection.	 * @use Expects <code>DefenderProxy</code> and <code>SpriteEntitiesProxy</code> to be registered previously.	 */ 	public function onRegister( ) : Void 	{		// local reference to the defender proxy		defenderProxy = DefenderProxy( facade.retrieveProxy( mediatorName ) );		// listen for enterframe events		sprite.onEnterFrame = Delegate.create( this, enterFrameHandler );		// Add defender balloon to sprite entities collection		sendNotification( GameFacade.ADD_SPRITE_ENTITY, AbstractSpriteDO( sprite ) );	}		/**	 * Called by the View when the Mediator is removed.	 * Removes defender balloon from sprite entities collection.	 * Unregisters listeners and removes sprite for garbage collection.	 */ 	public function onRemove( ) : Void 	{		// remove event listeners		sprite.onEnterFrame = null;		// Remove defender balloon to sprite entities collection		sendNotification( GameFacade.REMOVE_SPRITE_ENTITY, AbstractSpriteDO( sprite ) );		// Unload MovieClip		unloadMovie( sprite );	}		/**	 * List of all notifications this Mediator is interested in.	 * <P>	 * Automatically called by the framework when the mediator	 * is registered with the view.</P>	 * 	 * @return The list of Nofitication interests listed in.	 */	public function listNotificationInterests():Array 	{		return [ 			   ];	}		/**	 * Handle all notifications this Mediator is interested in.	 * <P>	 * Called by the framework when a notification is sent that	 * this mediator expressed an interest in when registered	 * 	 * @param INotification a notification 	 */	public function handleNotification( note : INotification ) : Void 	{	}		/**	 * {@code EnterFrame} handler updates the current defender balloon state.	 */	private function enterFrameHandler():Void 	{		defenderProxy.update();	}			/**	 * Cast the viewComponent to its actual type.	 * 	 * @return stage the viewComponent cast to MovieClip	 */	public function get sprite():MovieClip{		return MovieClip(viewComponent);	}}
