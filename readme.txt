@@ -1,4 +1,11 @@
 ----------------------------------------------------------------------------
+Flash CS3 Project
+----------------------------------------------------------------------------
+Open the Balloonatroid.flp project file in Flash CS3 to view all the class
+files and package hierarchy in the project panel. Opening Balloonatroid.swf 
+will run the game in Flash Player.
+
+----------------------------------------------------------------------------
 Package Space 
 ----------------------------------------------------------------------------
 Note that the ordinary package scheme that should be applied to this demo is 
