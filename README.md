@@ -15,10 +15,10 @@ Beta - [Version 0.5](https://github.com/PureMVC/puremvc-as2-demo-flashlite-ballo
 * [Adobe FlashLite](http://en.wikipedia.org/wiki/Flashlite)
 
 ## License
-Copyright (c) 2007, 2008 
-Cliff Hall <clifford.hall@puremvc.org> and 
-Chandima Cumaranatunge <chandima.cumaranatunge@puremvc.org>
-All rights reserved.
+* PureMVC AS2 FlashLite Demo - Balloonatroid - Copyright © 2007, 2008 
+Cliff Hall and Chandima Cumaranatunge
+* PureMVC - Copyright © 2007-2008 Futurescale, Inc.
+* All rights reserved.
 
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
